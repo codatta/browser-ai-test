@@ -1,6 +1,8 @@
 import os
 import sys
 
+from browser_use.agent.views import ActionResult
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import asyncio
 
@@ -17,10 +19,15 @@ browser = Browser(
 )
 controller = Controller()
 
+@controller.registry.action('Done task')
+async def done(text:str):
+	await browser.close()
+	print(f'now switching {text}')
+
+	return ActionResult(is_done=True, extracted_content='Context Switched!')
+
 async def main():
-	task = (f'''Go to https://www.bitrefill.com/buy,
-            choose cater's, then enter 5 dollor amount and add to cart,checkout,
-            then open in Metamask,click Open in MetaMask,click 取消 in new window''')
+	task = (f'''Go to https://www.bitrefill.com/buy,then done''')
 	model = ChatOpenAI(model='gpt-4o')
 	agent = Agent(
 		task=task,
